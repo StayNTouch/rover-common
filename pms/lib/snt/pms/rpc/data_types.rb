@@ -278,6 +278,22 @@ module SNT
           end
         end
 
+        class FinancialTransaction < Base
+          class << self
+            def find(id)
+              api.call('find', { namespace: :financial_transaction, id: id }, timeout: 30)
+            end
+          end
+        end
+
+        class Group < Base
+          class << self
+            def find(id)
+              api.call('find', { namespace: :group, id: id }, timeout: 30)
+            end
+          end
+        end
+
         class Hotel < Base
           attr_accessor :access_token,
                         :authorized,
@@ -381,6 +397,22 @@ module SNT
               #
               #   objects << new(object_attributes)
               # end
+            end
+          end
+        end
+
+        class Reservation < Base
+          class << self
+            def find(id)
+              api.call('find', { namespace: :reservation, id: id }, timeout: 30)
+            end
+          end
+        end
+
+        class ReservationDailyInstance < Base
+          class << self
+            def find(id)
+              api.call('find', { namespace: :reservation_daily_instance, id: id }, timeout: 30)
             end
           end
         end
