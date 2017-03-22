@@ -294,32 +294,43 @@ module SNT
           end
         end
 
-        class Hotel < Base
-          attr_accessor :access_token,
-                        :authorized,
-                        :currency,
-                        :refresh_token,
-                        :hotel_code
+        class GroupHoldStatus < Base
+          class << self
+            # Query should contain hotel_id
+            # ::SNT::PMS::RPC::GroupHoldStatus.where(hotel_id: 'id')
+            def where(query = {})
+              # Add RPC namespace
+              query[:namespace] = :group_hold_status
 
+              api.call('list', query, timeout: 30)
+            end
+          end
+        end
+
+        # Interface to PMS hotel API
+        # ::SNT::PMS::RPC::Hotel.find_by_code('code')
+        class Hotel < Base
           # TODO
           def save
             raise NotImplementedError
-            #
-            # payload = api.put('ext/hotels/settings/exact_token_update', to_hash)
-            #
-            # case payload[:response].code.to_i
-            #   when 200
-            #     true
-            #   when 401
-            #     @error = '401: Unauthorized request'
-            #     false
-            #   when 403
-            #     @error = '403: Forbidden request'
-            #     false
-            #   else
-            #     @error = "Unknown response code: #{payload[:response].code}"
-            #     false
-            # end
+          end
+
+          class << self
+            def find(id)
+              payload = api.call('find', { namespace: :hotel, id: id }, timeout: 30)
+
+              raise SNT::PMS::Errors::PMSError, payload['errors'] if payload.is_a?(Hash) && payload.key?('errors')
+
+              payload
+            end
+
+            def find_by_code(code)
+              payload = api.call('find_by_code', { namespace: :hotel, code: code }, timeout: 30)
+
+              raise SNT::PMS::Errors::PMSError, payload['errors'] if payload.is_a?(Hash) && payload.key?('errors')
+
+              payload
+            end
           end
         end
 
@@ -401,10 +412,21 @@ module SNT
           end
         end
 
+        # Interface to PMS Reservation API
         class Reservation < Base
           class << self
+            # ::SNT::PMS::RPC::Reservation.find('id')
             def find(id)
               api.call('find', { namespace: :reservation, id: id }, timeout: 30)
+            end
+
+            # Query should contain hotel_id
+            # ::SNT::PMS::RPC::Reservation.where(hotel_id: 'id')
+            def where(query = {})
+              # Add RPC namespace
+              query[:namespace] = :reservation
+
+              api.call('list', query, timeout: 6000)
             end
           end
         end
