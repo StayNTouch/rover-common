@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.description = 'Stayntouch'
   s.homepage     = ''
 
-  s.required_ruby_version = '>= 2.3.0'
+  s.required_ruby_version = '>= 2.1.7'
 
   s.files        = Dir.glob('{bin,lib}/**/*') + %w(README.md)
   s.bindir        = 'bin'
@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'snt_core', s.version
   s.add_dependency 'snt_pms', s.version
+  s.add_dependency 'snt_report', s.version
 
   s.add_development_dependency('rake', '>= 0')
 end
