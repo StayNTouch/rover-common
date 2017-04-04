@@ -291,6 +291,15 @@ module SNT
             def find(id)
               api.call('find', { namespace: :group, id: id }, timeout: 30)
             end
+
+            # Query should contain hotel_id
+            # ::SNT::PMS::RPC::Group.where(hotel_id: 'id')
+            def where(query = {})
+              # Add RPC namespace
+              query[:namespace] = :group
+
+              api.call('list', query, timeout: 6000)
+            end
           end
         end
 
