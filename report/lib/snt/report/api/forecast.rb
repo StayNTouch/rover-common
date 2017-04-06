@@ -4,7 +4,7 @@ module SNT
       class Forecast < Base
         class << self
           def get(*filters)
-            api.call('forecast', filters, timeout: 60)
+            api.call('get', filters, namespace: 'reports/forecast', timeout: 60)
           end
         end
       end
