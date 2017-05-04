@@ -95,10 +95,6 @@ module SNT
           # http://www.rabbitmq.com/confirms.html
           Thread.current[:bunny_channel] ||= ::SNT::Core::MQ.connection.create_channel.tap(&:confirm_select)
         end
-        #
-        # def thread
-        #   Thread.current[:"snt_publisher_#{self.object_id}"] ||= {}
-        # end
       end
     end
   end
