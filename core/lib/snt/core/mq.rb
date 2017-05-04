@@ -15,7 +15,7 @@ module SNT
       CONFIG = Configuration.new
 
       def connection
-        @connection
+        @connection || establish_connection!
       end
 
       def clear!
@@ -31,12 +31,6 @@ module SNT
       def configure(opts = {})
         CONFIG.merge!(opts)
         setup_general_logger!
-
-        begin
-          establish_connection!
-        rescue => e
-          logger.warn  e
-        end
 
         setup_general_publisher!
         @configured = true
