@@ -84,7 +84,7 @@ module SNT
         private
 
         def ensure_channel!
-          channel && channel.open?
+          Thread.current[:bunny_channel] = nil unless channel && channel.open?
         end
 
         def channel
