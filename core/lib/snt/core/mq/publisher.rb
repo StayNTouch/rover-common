@@ -3,12 +3,12 @@ require 'bunny'
 module SNT
   module Core
     module MQ
-      # = SNT Publisher
+      # = SNT MQ Publisher
       class Publisher
         # The Stayntouch publisher is library used to publish messages to message broker. This library
         # utilizes a single SNT configured AMPQ connection and channel. This is implemented using the Bunny gem.
         # Usage is quite simple and the only requirement is to configure SNT and call the publish message with
-        # a payload and any bunny publish options.
+        # a payload and any bunny publish options. This publisher is Thread Safe.
         #
         # == Configuration
         #
@@ -55,13 +55,15 @@ module SNT
             to_queue = options.delete(:to_queue)
             options[:routing_key] ||= to_queue
 
-            ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}> to [#{options[:routing_key]}]"
+            # Log the message being published with some context
+            ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}> to [#{exchange.name}, #{options[:routing_key]}]"
 
             times = 0
             while times <= 3 do
+              # Publish to RabbitMQ
               exchange.publish(msg, options)
 
-              # Block until all messages have been confirmed
+              # Block until message is confirmed. If it fails, retry up to 3 times.
               if channel.wait_for_confirms
                 break
               else
@@ -76,17 +78,19 @@ module SNT
 
           # Void the return
           nil
-          # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
+        # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
         rescue => e
           ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
         end
 
         private
 
+        # Check if we have a connection channel created yet and if it is open
         def ensure_channel!
           Thread.current[:bunny_channel] = nil unless channel && channel.open?
         end
 
+        # Find or create the channel for the current thread we will be using for publishing
         def channel
           # This channel will be dedicated to this publisher
           # By default this is a ampq.fanout channel
