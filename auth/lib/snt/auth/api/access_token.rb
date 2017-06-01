@@ -3,8 +3,8 @@ module SNT
     module API
       class AccessToken < Base
         class << self
-          def get(*filters)
-            api.call('call', filters, namespace: 'ValidateTokenService', timeout: 60)
+          def validate(token)
+            api.call('call', token, namespace: 'ValidateTokenService', timeout: 60)
           end
         end
       end
