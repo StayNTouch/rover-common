@@ -1,5 +1,5 @@
 module SNT
-  module Report
+  module Auth
     module API
       class AccessToken < Base
         class << self
