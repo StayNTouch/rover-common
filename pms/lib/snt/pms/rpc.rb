@@ -5,6 +5,7 @@ module SNT
       autoload :ChargeCode, 'snt/pms/rpc/charge_code'
       autoload :ExternalMapping, 'snt/pms/rpc/external_mapping'
       autoload :FinancialTransaction, 'snt/pms/rpc/financial_transaction'
+      autoload :FutureTransaction, 'snt/pms/rpc/future_transaction'
       autoload :Group, 'snt/pms/rpc/group'
       autoload :GroupHoldStatus, 'snt/pms/rpc/group_hold_status'
       autoload :Hotel, 'snt/pms/rpc/hotel'

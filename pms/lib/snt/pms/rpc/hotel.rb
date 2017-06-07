@@ -23,7 +23,7 @@ module SNT
 
           # ::SNT::PMS::RPC::Hotel.list
           def list(params = {})
-            api.call('list', [ params ] , namespace: :hotel, timeout: 300)
+            api.call('list', [ params ], namespace: :hotel, timeout: 300)
           end
         end
       end
