@@ -1,0 +1,50 @@
+# This is the configuration used to check the rubocop source code.
+
+AllCops:
+  TargetRubyVersion: 2.4
+
+Metrics/AbcSize:
+  Max: 30
+
+Rails/ActionFilter:
+  Enabled: false
+
+Metrics/BlockLength:
+  CountComments: false
+  Max: 25
+
+Metrics/BlockNesting:
+  Max: 10
+
+CaseEquality:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Metrics/ClassLength:
+  Max: 1000
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Documentation:
+  Enabled: false
+
+Style/Encoding:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 150
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/PerceivedComplexity:
+  Max: 12
+
+Style/StringLiterals:
+  Enabled: false
+
+Rails:
+  Enabled: true
