@@ -10,6 +10,7 @@ module SNT
       autoload :Hotel, 'snt/pms/rpc/hotel'
       autoload :Reservation, 'snt/pms/rpc/reservation'
       autoload :ReservationDailyInstance, 'snt/pms/rpc/reservation_daily_instance'
+      autoload :User, 'snt/pms/rpc/user'
     end
   end
 end
