@@ -4,7 +4,7 @@ module SNT
       class AccessToken < Base
         class << self
           def validate(token)
-            api.call('call', token, namespace: 'AccessToken::Validate', timeout: 60)
+            api.call('validate', token, namespace: 'AccessToken', timeout: 60)
           end
         end
       end
