@@ -12,7 +12,7 @@ module SNT
           # Query should contain hotel_id
           # ::SNT::PMS::RPC::Reservation.list(1, limit: 1)
           def list(hotel_id, params = {})
-            api.call('list', [ hotel_id, params ] , namespace: :reservation, timeout: 6000)
+            api.call('list', [ hotel_id, params ], namespace: :reservation, timeout: 6000)
           end
         end
       end
