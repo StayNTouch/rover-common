@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'snt_core', s.version
   s.add_dependency 'snt_pms', s.version
   s.add_dependency 'snt_report', s.version
+  s.add_dependency 'snt_auth', s.version
 
   s.add_development_dependency('rake', '>= 0')
 end
