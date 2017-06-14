@@ -9,6 +9,7 @@ module SNT
       autoload :Group, 'snt/pms/rpc/group'
       autoload :GroupHoldStatus, 'snt/pms/rpc/group_hold_status'
       autoload :Hotel, 'snt/pms/rpc/hotel'
+      autoload :PostingAccount, 'snt/pms/rpc/posting_account'
       autoload :Reservation, 'snt/pms/rpc/reservation'
       autoload :ReservationDailyInstance, 'snt/pms/rpc/reservation_daily_instance'
     end
