@@ -32,7 +32,7 @@ module SNT
             created_at: Time.now.to_f,
             method: method,
             args: message
-          }.tap { |o| o[:namespace] = options[:namespace] if options.key?(:namespace) },
+          },
           compile_options(options)
         )
       end

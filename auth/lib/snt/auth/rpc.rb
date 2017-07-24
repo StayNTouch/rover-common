@@ -20,7 +20,7 @@ module SNT
       # @param options [Hash] Possible options include: timeout [Integer], namespace [String]
       # @return [Object] Response from remote service
       #
-      def call(method, message, options = {})
+      def self.call(method, message, options = {})
         queue = options.delete(:queue) || 'api'
 
         SneakersPacker.remote_call(
@@ -32,7 +32,7 @@ module SNT
             created_at: Time.now.to_f,
             method: method,
             args: message
-          }.tap { |o| o[:namespace] = options[:namespace] if options.key?(:namespace) },
+          },
           compile_options(options)
         )
       end
