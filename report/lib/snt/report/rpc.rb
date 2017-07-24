@@ -20,7 +20,7 @@ module SNT
       # @param options [Hash] Possible options include: timeout [Integer], namespace [String]
       # @return [Object] Response from remote service
       #
-      def call(method, message, options = {})
+      def self.call(method, message, options = {})
         queue = options.delete(:queue) || 'api'
 
         SneakersPacker.remote_call(
