@@ -20,10 +20,19 @@ module SNT
       # @param options [Hash] Possible options include: timeout [Integer], namespace [String]
       # @return [Object] Response from remote service
       #
-      def self.call(method, message, options = {})
+      def call(method, message, options = {})
+        queue = options.delete(:queue) || 'api'
+
         SneakersPacker.remote_call(
-          'auth.api.rpc',
-          { method: method, args: message }.tap { |o| o[:namespace] = options[:namespace] if options.key?(:namespace) },
+          "auth.#{queue}.rpc",
+          {
+            request_id: SecureRandom.uuid,
+            # Set expires_at based on SneakersPacker rpc_timeout in seconds of Epoch format per rfc1057
+            expires_at: Time.now.to_f + (options[:timeout] || SneakersPacker.conf.rpc_timeout).to_f,
+            created_at: Time.now.to_f,
+            method: method,
+            args: message
+          }.tap { |o| o[:namespace] = options[:namespace] if options.key?(:namespace) },
           compile_options(options)
         )
       end
