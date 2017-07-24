@@ -3,15 +3,7 @@ require 'sneakers_packer'
 module SNT
   module Report
     class RPC
-      # Sanitize options being sent to
-      # SneakerPacker remote_call method.
-      def self.compile_options(options)
-        defaults = {
-          timeout: nil
-        }
-
-        defaults.merge((options.is_a?(Hash) ? options : {}).delete_if { |k, _| !defaults.key?(k) }).compact
-      end
+      include ::SNT::Core::RPC
 
       # Execute remote procedural call on the report application
       #

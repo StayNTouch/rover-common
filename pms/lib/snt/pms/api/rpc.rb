@@ -4,17 +4,9 @@ module SNT
   module PMS
     module API
       class RPC < Base
+        include ::SNT::Core::RPC
+
         class << self
-          # Sanitize options being sent to
-          # SneakerPacker remote_call method.
-          def compile_options(options)
-            defaults = {
-              timeout: nil
-            }
-
-            defaults.merge((options.is_a?(Hash) ? options : {}).delete_if { |k, _| !defaults.key?(k) }).compact
-          end
-
           # Execute remote procedural call on the report application
           #
           # @param method [String] Name of method to call
@@ -26,7 +18,7 @@ module SNT
             queue = options.delete(:queue) || 'api'
 
             SneakersPacker.remote_call(
-              'pms.api.rpc',
+              "pms.#{queue}.rpc",
               {
                 request_id: SecureRandom.uuid,
                 # Set expires_at based on SneakersPacker rpc_timeout in seconds of Epoch format per rfc1057
