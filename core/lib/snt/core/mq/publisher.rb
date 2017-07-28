@@ -60,7 +60,8 @@ module SNT
               options[:routing_key] ||= to_queue
 
               # Log the message being published with some context
-              ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}> to [#{exchange.name}, #{options[:routing_key]}]"
+              ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}> to " /
+                                          "[#{exchange.name}, #{options[:routing_key]}]"
 
               times = 0
               while times <= 3 do
@@ -83,7 +84,7 @@ module SNT
 
               error_retry_count += 1
 
-              ::SNT::Core::MQ.logger.warn "Current Rabbitmq connection is closed. Create connection and retry(#{error_retry_count}/#{ERROR_MAX_RETRY_COUNT})"
+              ::SNT::Core::MQ.logger.warn "Rabbitmq connection is closed. Create connection and retry(#{error_retry_count}/#{ERROR_MAX_RETRY_COUNT})"
 
               Thread.current[:bunny_channel] = nil
               ::SNT::Core::MQ.reconnect!
