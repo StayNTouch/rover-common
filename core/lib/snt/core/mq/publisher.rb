@@ -34,6 +34,8 @@ module SNT
         #  ::SNT::Core::MQ.publisher.publish('This is my message.', exchange: 'example', exchange_options: { type: :direct })
         #
 
+        ERROR_MAX_RETRY_COUNT = 3
+
         def initialize
           @mutex = Mutex.new
         end
@@ -41,44 +43,48 @@ module SNT
         def publish(msg, options = {})
           # Threadsafe publish
           @mutex.synchronize do
-            # Channel verification
-            ensure_channel!
+            error_retry_count = 0
+            begin
+              # Channel verification
+              ensure_channel!
 
-            # Check for targeted exchange, otherwise use the default
-            exchange = if options[:exchange]
-              channel.exchange(options[:exchange], options[:exchange_options])
-            else
-              channel.default_exchange
-            end
+              # Check for targeted exchange, otherwise use the default
+              exchange = options[:exchange] ? channel.exchange(options[:exchange], options[:exchange_options]) : channel.default_exchange
 
-            # Establish route
-            to_queue = options.delete(:to_queue)
-            options[:routing_key] ||= to_queue
+              # Establish route
+              to_queue = options.delete(:to_queue)
+              options[:routing_key] ||= to_queue
 
-            # Log the message being published with some context
-            ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}> to [#{exchange.name}, #{options[:routing_key]}]"
+              # Log the message being published with some context
+              ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}>" \
+                                          " to [#{exchange.name}, #{options[:routing_key]}]"
 
-            times = 0
-            while times <= 3 do
-              # Publish to RabbitMQ
-              exchange.publish(msg, options)
+              times = 0
+              while times <= 3 do
+                # Publish to RabbitMQ
+                exchange.publish(msg, options)
 
-              # Block until message is confirmed. If it fails, retry up to 3 times.
-              if channel.wait_for_confirms
-                break
-              else
-                times += 1
+                # Block until message is confirmed. If it fails, retry up to 3 times.
+                if channel.wait_for_confirms
+                  break
+                else
+                  times += 1
 
-                channel.nacked_set.each do |n|
-                  ::SNT::Core::MQ.logger.error "publishing message with id #{n} to #{options[:routing_key]} was nacked by broker time(s) #{times}"
+                  channel.nacked_set.each do |n|
+                    ::SNT::Core::MQ.logger.error "publishing message with id #{n} to #{options[:routing_key]} was nacked by broker time(s) #{times}"
+                  end
                 end
               end
+            rescue Bunny::ConnectionClosedError => e
+              error_retry_count += 1
+              connection_closed_error_handler(e, error_retry_count)
+              retry
             end
           end
 
           # Void the return
           nil
-        # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
+            # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
         rescue => e
           ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
         end
@@ -98,6 +104,15 @@ module SNT
           # Put channel in confirmation mode
           # http://www.rabbitmq.com/confirms.html
           Thread.current[:bunny_channel] ||= ::SNT::Core::MQ.connection.create_channel.tap(&:confirm_select)
+        end
+
+        def connection_closed_error_handler(e, error_retry_count)
+          raise e if error_retry_count > ERROR_MAX_RETRY_COUNT
+
+          ::SNT::Core::MQ.logger.warn "Rabbitmq connection is closed. Create connection and retry(#{error_retry_count}/#{ERROR_MAX_RETRY_COUNT})"
+
+          Thread.current[:bunny_channel] = nil
+          ::SNT::Core::MQ.reconnect!
         end
       end
     end
