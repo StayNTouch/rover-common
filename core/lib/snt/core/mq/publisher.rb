@@ -49,18 +49,15 @@ module SNT
               ensure_channel!
 
               # Check for targeted exchange, otherwise use the default
-              exchange = if options[:exchange]
-                           channel.exchange(options[:exchange], options[:exchange_options])
-                         else
-                           channel.default_exchange
-                         end
+              exchange = options[:exchange] ? channel.exchange(options[:exchange], options[:exchange_options]) : channel.default_exchange
 
               # Establish route
               to_queue = options.delete(:to_queue)
               options[:routing_key] ||= to_queue
 
               # Log the message being published with some context
-              ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}> to [#{exchange.name}, #{options[:routing_key]}]"
+              ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}>" \
+                                          " to [#{exchange.name}, #{options[:routing_key]}]"
 
               times = 0
               while times <= 3 do
@@ -79,14 +76,8 @@ module SNT
                 end
               end
             rescue Bunny::ConnectionClosedError => e
-              raise e if error_retry_count >= ERROR_MAX_RETRY_COUNT
-
               error_retry_count += 1
-
-              ::SNT::Core::MQ.logger.warn "Current Rabbitmq connection is closed. Create connection and retry(#{error_retry_count}/#{ERROR_MAX_RETRY_COUNT})"
-
-              Thread.current[:bunny_channel] = nil
-              ::SNT::Core::MQ.reconnect!
+              connection_closed_error_handler(e, error_retry_count)
               retry
             end
           end
@@ -113,6 +104,15 @@ module SNT
           # Put channel in confirmation mode
           # http://www.rabbitmq.com/confirms.html
           Thread.current[:bunny_channel] ||= ::SNT::Core::MQ.connection.create_channel.tap(&:confirm_select)
+        end
+
+        def connection_closed_error_handler(e, error_retry_count)
+          raise e if error_retry_count > ERROR_MAX_RETRY_COUNT
+
+          ::SNT::Core::MQ.logger.warn "Rabbitmq connection is closed. Create connection and retry(#{error_retry_count}/#{ERROR_MAX_RETRY_COUNT})"
+
+          Thread.current[:bunny_channel] = nil
+          ::SNT::Core::MQ.reconnect!
         end
       end
     end
