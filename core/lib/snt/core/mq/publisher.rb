@@ -93,7 +93,7 @@ module SNT
 
           # Void the return
           nil
-            # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
+        # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
         rescue => e
           ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
         end
