@@ -3,7 +3,7 @@ require_relative '../core/lib/snt/core/version.rb'
 
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
-  s.name = 'snt_report'
+  s.name = 'snt_webhook'
   s.version = SNT::VERSION
   s.summary = ''
   s.description = ''
