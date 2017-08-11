@@ -3,24 +3,17 @@ module SNT
     module API
       class Webhooks < Base
         class << self
+          # Define basic api methods
+          #
           # ::SNT::Webhook::API::Webhooks.index(chain_uuid)
-          def index(*args)
-            api.call('index', args, namespace: :webhook, timeout: 60)
-          end
-
           # ::SNT::Webhook::API::Webhooks.show(uuid)
-          def show(*args)
-            api.call('show', args, namespace: :webhook, timeout: 60)
-          end
-
           # ::SNT::Webhook::API::Webhooks.create(params)
-          def create(*args)
-            api.call('create', args, namespace: :webhook, timeout: 60)
-          end
-
           # ::SNT::Webhook::API::Webhooks.update(uuid, params)
-          def update(*args)
-            api.call('update', args, namespace: :webhook, timeout: 60)
+          #
+          %w(index show create update).each do |method_name|
+            define_method(method_name.to_sym) do |*args|
+              api.call(method_name, args, namespace: :webhook, timeout: 60)
+            end
           end
 
           # ::SNT::Webhook::API::Webhooks.supporting_events
