@@ -27,7 +27,6 @@ module SNT
           def supporting_events
             api.call('supporting_events', {}, namespace: :webhook, timeout: 60)
           end
-
         end
       end
     end
