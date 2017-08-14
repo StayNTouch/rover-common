@@ -20,6 +20,11 @@ module SNT
           def supporting_events
             api.call('supporting_events', {}, namespace: :webhook, timeout: 60)
           end
+
+          # ::SNT::Webhook::API::Webhooks.delivery_types
+          def delivery_types
+            api.call('delivery_types', {}, namespace: :webhook, timeout: 60)
+          end
         end
       end
     end
