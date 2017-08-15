@@ -9,8 +9,9 @@ module SNT
           # ::SNT::Webhook::API::Webhooks.show(uuid)
           # ::SNT::Webhook::API::Webhooks.create(params)
           # ::SNT::Webhook::API::Webhooks.update(uuid, params)
+          # ::SNT::Webhook::API::Webhooks.destroy(uuid)
           #
-          %w(index show create update).each do |method_name|
+          %w(index show create update destroy).each do |method_name|
             define_method(method_name.to_sym) do |*args|
               api.call(method_name, args, namespace: :webhook, timeout: 60)
             end
