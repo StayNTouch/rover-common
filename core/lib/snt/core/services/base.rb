@@ -1,4 +1,4 @@
-class Services::Base
+class SNT::Core::Services::Base
   delegate :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :publish_events, to: :result
 
   # Provide class level call method as convenience over calling new, then call

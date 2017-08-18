@@ -1,4 +1,4 @@
-class Services::Event
+class SNT::Core::Services::Event
   attr_accessor :hotel, :object, :action_type, :details, :published
 
   def initialize(args)

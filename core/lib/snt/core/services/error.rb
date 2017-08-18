@@ -1,4 +1,4 @@
-class Services::Error
+class SNT::Core::Services::Error
   VALIDATION_ERROR = 'VALIDATION_ERROR'.freeze
 
   attr_accessor :code, :message

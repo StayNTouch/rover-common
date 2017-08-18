@@ -4,6 +4,7 @@ module SNT
     autoload :MQ, 'snt/core/mq'
     autoload :Ref, 'snt/core/ref'
     autoload :RPC, 'snt/core/rpc'
+    autoload :Services, 'snt/core/services'
   end
 end
 

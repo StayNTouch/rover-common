@@ -1,4 +1,4 @@
-class Services::Result
+class SNT::Core::Services::Result
   attr_accessor :data, :errors, :warnings, :events
 
   def initialize
