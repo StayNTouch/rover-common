@@ -41,7 +41,7 @@ class SNT::Core::Services::Result
   end
 
   # Merge another service's result object with this one for the errors, warnings, and events
-  def merge(result)
+  def merge_result(result)
     self.errors += result.errors
     self.warnings += result.warnings
     self.events += result.events
