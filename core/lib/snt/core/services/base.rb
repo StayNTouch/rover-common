@@ -1,5 +1,5 @@
 class SNT::Core::Services::Base
-  delegate :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :publish_events, to: :result
+  delegate :new_error, :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :publish_events, to: :result
 
   # Provide class level call method as convenience over calling new, then call
   def self.call(*args, &block)
@@ -26,7 +26,7 @@ class SNT::Core::Services::Base
     publish_events if ActiveRecord::Base.connection.open_transactions.zero? && result.status
 
     result
-  rescue InvalidException
+  rescue SNT::Core::Services::InvalidException
     result
   rescue ActiveRecord::RecordInvalid => e
     add_active_record_errors(e.record)
@@ -39,11 +39,11 @@ class SNT::Core::Services::Base
   # Add a validation error (if present) and raise an invalid exception
   def invalidate!(message = nil)
     add_validation_error(message) if message.present?
-    raise InvalidException
+    raise SNT::Core::Services::InvalidException
   end
 
   def result
-    @result ||= Result.new
+    @result ||= SNT::Core::Services::Result.new
   end
 
   # Merge another service's result object with this service's result. Invalidate if errors exist.

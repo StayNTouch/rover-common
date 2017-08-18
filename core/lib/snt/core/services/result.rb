@@ -8,8 +8,12 @@ class SNT::Core::Services::Result
     @events = []
   end
 
+  def add_error(code, message)
+    @errors << SNT::Core::Services::Error.new_error(code, message)
+  end
+
   def add_validation_error(message)
-    @errors << Error.new_validation_error(message)
+    @errors << SNT::Core::Services::Error.new_validation_error(message)
   end
 
   def add_validation_errors(messages)

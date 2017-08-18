@@ -7,7 +7,7 @@ class SNT::Core::Services::Error
     args.each { |key, value| instance_variable_set("@#{key}", value) }
   end
 
-  def self.new_validation_error(obj)
+  def self.new_error(code, obj)
     message =
       if obj.is_a?(Symbol)
         I18n.t(obj)
@@ -16,7 +16,11 @@ class SNT::Core::Services::Error
       end
 
     logger.debug(message)
-    new(code: VALIDATION_ERROR, message: message)
+    new(code: code, message: message)
+  end
+
+  def self.new_validation_error(obj)
+    new_error(VALIDATION_ERROR, obj)
   end
 
   def to_hash
