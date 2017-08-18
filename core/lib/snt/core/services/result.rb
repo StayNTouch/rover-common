@@ -9,7 +9,7 @@ class SNT::Core::Services::Result
   end
 
   def add_validation_error(message)
-    @errors << Services::Error.new_validation_error(message)
+    @errors << Error.new_validation_error(message)
   end
 
   def add_validation_errors(messages)

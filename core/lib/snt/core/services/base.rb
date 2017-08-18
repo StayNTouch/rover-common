@@ -26,7 +26,7 @@ class SNT::Core::Services::Base
     publish_events if ActiveRecord::Base.connection.open_transactions.zero? && result.status
 
     result
-  rescue Services::InvalidException
+  rescue InvalidException
     result
   rescue ActiveRecord::RecordInvalid => e
     add_active_record_errors(e.record)
@@ -39,11 +39,11 @@ class SNT::Core::Services::Base
   # Add a validation error (if present) and raise an invalid exception
   def invalidate!(message = nil)
     add_validation_error(message) if message.present?
-    raise Services::InvalidException
+    raise InvalidException
   end
 
   def result
-    @result ||= Services::Result.new
+    @result ||= Result.new
   end
 
   # Merge another service's result object with this service's result. Invalidate if errors exist.
