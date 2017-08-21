@@ -15,7 +15,6 @@ class SNT::Core::Services::Error
         obj
       end
 
-    logger.debug(message)
     new(code: code, message: message)
   end
 
