@@ -49,6 +49,6 @@ class SNT::Core::Services::Base
   # Merge another service's result object with this service's result. Invalidate if errors exist.
   def merge_result!(other_result)
     merge_result(other_result)
-    invalidate! unless result.status
+    invalidate! unless other_result.status
   end
 end
