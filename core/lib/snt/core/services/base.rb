@@ -5,10 +5,6 @@ module SNT
         delegate :invalidate!, :add_error, :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :merge_result!,
                  :publish_events, to: :result
 
-        class << self
-          attr_accessor :completion_callbacks, :error_callbacks
-        end
-
         # Provide class level call method as convenience over calling new, then call
         def self.call(*args, &block)
           new(*args, &block).call
@@ -60,21 +56,27 @@ module SNT
         end
 
         def self.on_error(method_name)
-          error_callbacks ||= []
           error_callbacks << method_name
         end
 
         def self.on_completion(method_name)
-          completion_callbacks ||= []
           completion_callbacks << method_name
         end
 
+        def self.error_callbacks
+          @error_callbacks ||= []
+        end
+
+        def self.completion_callbacks
+          @completion_callbacks ||= []
+        end
+
         def execute_error_callbacks
-          Base.error_callbacks && Base.error_callbacks.each { |method| send(method) }
+          Base.error_callbacks.each { |method| send(method) }
         end
 
         def execute_completion_callbacks
-          Base.completion_callbacks && Base.completion_callbacks.each { |method| send(method) }
+          Base.completion_callbacks.each { |method| send(method) }
         end
 
         # Call another service by passing the class, its attributes, and options. Invalidate this service if the other service failed.
