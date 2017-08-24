@@ -40,11 +40,25 @@ class SNT::Core::Services::Result
     errors.map(&:message)
   end
 
+  # Add a validation error (if present) and raise an invalid exception
+  def invalidate!(message = nil)
+    add_validation_error(message) if message.present?
+    raise SNT::Core::Services::InvalidException
+  end
+
   # Merge another service's result object with this one for the errors, warnings, and events
-  def merge_result(result)
-    self.errors += result.errors
-    self.warnings += result.warnings
-    self.events += result.events
+  def merge_result(other_result, options = {})
+    self.errors += other_result.errors unless options[:ignore_errors]
+    self.warnings += other_result.warnings
+    self.events += other_result.events
+
+    other_result
+  end
+
+  # Merge another service's result object with this service's result. Invalidate unless this service status is true.
+  def merge_result!(other_result, options = {})
+    merge_result(other_result, options)
+    invalidate! unless status
   end
 
   # Get a list of only the unpublished events
