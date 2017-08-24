@@ -59,10 +59,12 @@ module SNT
           @result ||= Result.new
         end
 
+        # Execute the error callbacks when the service fails due to errors
         def execute_error_callbacks
           self.class.error_callbacks.each { |method_name| send(method_name) }
         end
 
+        # Execute the completion callbacks when the service completes, success or failure
         def execute_completion_callbacks
           self.class.completion_callbacks.each { |method_name| send(method_name) }
         end
