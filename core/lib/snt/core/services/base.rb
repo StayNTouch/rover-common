@@ -5,6 +5,9 @@ module SNT
         delegate :invalidate!, :add_error, :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :merge_result!,
                  :publish_events, to: :result
 
+        @error_callbacks = []
+        @completion_callbacks = []
+
         # Provide class level call method as convenience over calling new, then call
         def self.call(*args, &block)
           new(*args, &block).call
@@ -27,14 +30,24 @@ module SNT
             end
           end
 
-          publish_events if ActiveRecord::Base.connection.open_transactions.zero? && result.status
+          if result.status
+            publish_events if ActiveRecord::Base.connection.open_transactions.zero?
+          else
+            execute_error_callbacks
+          end
 
           result
         rescue InvalidException
+          execute_error_callbacks
+
           result
         rescue ActiveRecord::RecordInvalid => e
           add_active_record_errors(e.record)
+          execute_error_callbacks
+
           result
+        ensure
+          execute_completion_callbacks
         end
 
         # All services should override call_delegate
@@ -43,6 +56,22 @@ module SNT
         # Get the result object. Initialize if not present.
         def result
           @result ||= Result.new
+        end
+
+        def self.on_error(method_name)
+          @error_callbacks << method_name
+        end
+
+        def self.on_completion(method_name)
+          @completion_callbacks << method_name
+        end
+
+        def execute_error_callbacks
+          @error_callbacks.each { |method| send(method) }
+        end
+
+        def execute_completion_callbacks
+          @completion_callbacks.each { |method| send(method) }
         end
 
         # Call another service by passing the class, its attributes, and options. Invalidate this service if the other service failed.
