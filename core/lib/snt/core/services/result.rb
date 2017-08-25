@@ -62,6 +62,8 @@ module SNT
         def merge_result!(other_result, options = {})
           merge_result(other_result, options)
           invalidate! unless status
+
+          other_result
         end
 
         # Get a list of only the unpublished events
