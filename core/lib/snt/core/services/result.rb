@@ -73,7 +73,7 @@ module SNT
 
         # Publish the events to RabbitMQ. This should only be done once the transaction is committed successfully and service is successful.
         def publish_events
-          raise 'Cannot publish events unless service is successful' unless result.status
+          raise 'Cannot publish events unless service is successful' unless status
           unpublished_events.each(&:publish)
         end
       end
