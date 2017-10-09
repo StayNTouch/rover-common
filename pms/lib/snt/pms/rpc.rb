@@ -13,6 +13,7 @@ module SNT
       autoload :Reservation, 'snt/pms/rpc/reservation'
       autoload :ReservationDailyInstance, 'snt/pms/rpc/reservation_daily_instance'
       autoload :User, 'snt/pms/rpc/user'
+      autoload :InactiveRoom, 'snt/pms/rpc/inactive_room'
     end
   end
 end
