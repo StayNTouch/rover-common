@@ -6,7 +6,7 @@ module SNT
           # Query should contain hotel_id
           # ::SNT::PMS::RPC::GroupHoldStatus.list(1)
           def list(hotel_id)
-            api.call('list', hotel_id, namespace: :group_hold_status, timeout: 30)
+            api.call('list', hotel_id, namespace: :group_hold_status)
           end
         end
       end

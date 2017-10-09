@@ -5,7 +5,7 @@ module SNT
         class << self
           # ::SNT::PMS::RPC::ReservationDailyInstance.find(1)
           def find(id)
-            api.call('find', id, namespace: :reservation_daily_instance, timeout: 30)
+            api.call('find', id, namespace: :reservation_daily_instance)
           end
         end
       end

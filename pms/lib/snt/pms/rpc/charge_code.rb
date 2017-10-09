@@ -15,7 +15,7 @@ module SNT
 
           # charge_codes = ::SNT::PMS::RPC::ChargeCode.where(hotel_code: @property.code, date: date)
           def where(query = {})
-            payload = api.call('charge_code_journals', [ query ], namespace: :accounting, timeout: 60)
+            payload = api.call('charge_code_journals', [ query ], namespace: :accounting)
 
             raise SNT::PMS::Errors::PMSError, payload['errors'] if payload.key?('errors')
 

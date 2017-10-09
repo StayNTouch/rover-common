@@ -13,7 +13,7 @@ module SNT
 
           # ::SNT::PMS::RPC::ExternalMapping.where(interface: 'accountview', hotel_code: 'GHLD')
           def where(query = {})
-            payload = api.call('interface', [ query ], namespace: :mapping, timeout: 30)
+            payload = api.call('interface', [ query ], namespace: :mapping)
 
             raise SNT::PMS::Errors::PMSError, payload['errors'] if payload.key?('errors')
 
