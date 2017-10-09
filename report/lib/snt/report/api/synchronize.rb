@@ -11,9 +11,9 @@ module SNT
               params += [ options[:from_date], options[:to_date] ]
             end
 
-            api.call('synchronize', params , namespace: 'facts/financial_transaction', timeout: 600)
-            api.call('synchronize', params, namespace: 'facts/group', timeout: 600)
-            api.call('synchronize', params, namespace: 'facts/reservation_instance', timeout: 600)
+            api.call('synchronize', params , namespace: 'facts/financial_transaction')
+            api.call('synchronize', params, namespace: 'facts/group')
+            api.call('synchronize', params, namespace: 'facts/reservation_instance')
           end
         end
       end
