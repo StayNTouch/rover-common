@@ -2,7 +2,7 @@ module SNT
   module Core
     module Services
       class Base
-        delegate :invalidate!, :add_error, :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :merge_result!,
+        delegate :invalidate!, :add_warning, :add_error, :add_validation_error, :add_validation_errors, :add_active_record_errors, :merge_result, :merge_result!,
                  :publish_events, to: :result
 
         def self.inherited(base)

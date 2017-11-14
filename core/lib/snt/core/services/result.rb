@@ -11,6 +11,10 @@ module SNT
           @events = []
         end
 
+        def add_warning(message)
+          @warnings << I18n.t(message)
+        end
+
         def add_error(code, message)
           @errors << Error.new_error(code, message)
         end
