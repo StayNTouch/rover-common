@@ -11,7 +11,6 @@ module SNT
         def self.new_validation_error(obj)
           new_error(VALIDATION_ERROR, obj)
         end
-
       end
     end
   end
