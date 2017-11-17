@@ -4,11 +4,17 @@ module SNT
       class Result
         attr_accessor :data, :errors, :warnings, :events
 
+        WARNING = 'WARNING'.freeze
+
         def initialize
           @data = {}
           @errors = []
           @warnings = []
           @events = []
+        end
+
+        def add_warning(message, code = WARNING)
+          @warnings << Warning.new_warning(code, message)
         end
 
         def add_error(code, message)
@@ -32,7 +38,7 @@ module SNT
         end
 
         def to_hash
-          { status: status, data: data, errors: errors.map(&:to_hash) }
+          { status: status, data: data, errors: errors.map(&:to_hash), warnings: warnings.map(&:to_hash) }
         end
 
         def formatted_errors
@@ -41,6 +47,14 @@ module SNT
 
         def error_messages
           errors.map(&:message)
+        end
+
+        def formatted_warnings
+          warning_messages.join('; ')
+        end
+
+        def warning_messages
+          warnings.map(&:message)
         end
 
         # Add a validation error (if present) and raise an invalid exception
