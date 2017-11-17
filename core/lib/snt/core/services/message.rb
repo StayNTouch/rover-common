@@ -2,7 +2,6 @@ module SNT
   module Core
     module Services
       class Message
-
         attr_accessor :code, :message
 
         def initialize(args)
