@@ -4,6 +4,8 @@ module SNT
       class Result
         attr_accessor :data, :errors, :warnings, :events
 
+        WARNING = 'WARNING'.freeze
+
         def initialize
           @data = {}
           @errors = []
@@ -11,8 +13,8 @@ module SNT
           @events = []
         end
 
-        def add_warning(message)
-          @warnings << I18n.t(message)
+        def add_warning(message, code = WARNING)
+          @warnings << Warning.new_warning(code, message)
         end
 
         def add_error(code, message)
