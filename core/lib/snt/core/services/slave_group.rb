@@ -1,3 +1,4 @@
+# Module used to declare that the entire service execution should route reads to the selected slave group
 module SNT
   module Core
     module Services
