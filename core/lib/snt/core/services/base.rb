@@ -7,6 +7,7 @@ module SNT
 
         def self.inherited(base)
           base.extend(Callbacks)
+          base.extend(SlaveGroup)
         end
 
         # Provide class level call method as convenience over calling new, then call
