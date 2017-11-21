@@ -19,17 +19,7 @@ module SNT
         #   - no_transaction [boolean] Do not start a transaction
         # @return [Services::Result]
         def call(options = {})
-          if options[:no_transaction]
-            # Don't start a transaction if no_transaction is true
-            call_delegate
-          else
-            # Start a transaction around the service call. Use requires_new to ensure sub transactions can be rolled back without impacting parent
-            # transaction. Services can optionally be invalidated and its transaction rolled back, when a sub-service fails and its sub-transaction is
-            # rolled back.
-            ActiveRecord::Base.transaction(requires_new: true) do
-              call_delegate
-            end
-          end
+          call_with_options(options)
 
           if result.status
             publish_events if ActiveRecord::Base.connection.open_transactions.zero?
@@ -81,6 +71,34 @@ module SNT
         # - ignore_errors [boolean] Do not add other service's errors to this service's errors
         def call_service(service_class, attributes, options = { ignore_errors: true })
           merge_result(service_class.new(attributes).call, options)
+        end
+
+        private
+
+        # Wrap call execution with optional slave group and transaction blocks
+        def call_with_options(options)
+          if self.class.slave_group.present?
+            Octopus.using(slave_group: self.class.slave_group) do
+              call_with_optional_transaction(options)
+            end
+          else
+            call_with_optional_transaction(options)
+          end
+        end
+
+        # Wrap call execution with optional transaction block
+        def call_with_optional_transaction(options)
+          if options[:no_transaction]
+            # Don't start a transaction if no_transaction is true
+            call_delegate
+          else
+            # Start a transaction around the service call. Use requires_new to ensure sub transactions can be rolled back without impacting parent
+            # transaction. Services can optionally be invalidated and its transaction rolled back, when a sub-service fails and its sub-transaction is
+            # rolled back.
+            ActiveRecord::Base.transaction(requires_new: true) do
+              call_delegate
+            end
+          end
         end
       end
     end
