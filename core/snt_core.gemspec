@@ -16,4 +16,6 @@ Gem::Specification.new do |s|
 
   s.files        = `git ls-files`.split("\n")
   s.require_path = 'lib'
+
+  s.add_dependency('logging-rails', '>= 0.4.0')
 end
