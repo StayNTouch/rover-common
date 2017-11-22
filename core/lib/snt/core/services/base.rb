@@ -20,6 +20,8 @@ module SNT
         #   - no_transaction [boolean] Do not start a transaction
         # @return [Services::Result]
         def call(options = {})
+          log_start
+
           call_with_options(options)
 
           if result.status
@@ -40,6 +42,7 @@ module SNT
           result
         ensure
           execute_completion_callbacks
+          log_completion
         end
 
         # All services should override call_delegate
@@ -100,6 +103,23 @@ module SNT
               call_delegate
             end
           end
+        end
+
+        # Log the start of the service call
+        def log_start
+          @start_time = Time.now.utc
+          logger.info "Starting #{self.class.name} service call"
+        end
+
+        # Log the completion of the service call
+        def log_completion
+          duration = Time.now.utc - @start_time
+          logger.info "Finished #{self.class.name} service call, duration: #{duration}, status: #{result.status}, " \
+                      "errors: #{result.formatted_errors}, open transactions: #{ActiveRecord::Base.connection.open_transactions}"
+        end
+
+        def logger
+          @logger ||= Logging::Logger[self.class.name]
         end
       end
     end
