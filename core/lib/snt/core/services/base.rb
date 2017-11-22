@@ -108,16 +108,17 @@ module SNT
         # Log the start of the service call
         def log_start
           @start_time = Time.now.utc
-          logger.info "Starting #{self.class.name} service call"
+          logger.info "Service Starting"
         end
 
         # Log the completion of the service call
         def log_completion
           duration = Time.now.utc - @start_time
-          logger.info "Finished #{self.class.name} service call, duration: #{duration}, status: #{result.status}, " \
-                      "errors: #{result.formatted_errors}, open transactions: #{ActiveRecord::Base.connection.open_transactions}"
+          logger.info "Service Completed, duration: #{duration}, status: #{result.status}, errors: #{result.error_messages}, " \
+                      "open transactions: #{ActiveRecord::Base.connection.open_transactions}"
         end
 
+        # Initialize the logger with the class name
         def logger
           @logger ||= Logging::Logger[self.class.name]
         end
