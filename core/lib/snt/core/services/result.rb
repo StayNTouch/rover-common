@@ -75,7 +75,7 @@ module SNT
         # Merge another service's result object with this service's result. Invalidate unless this service status is true.
         def merge_result!(other_result, options = {})
           merge_result(other_result, options)
-          invalidate! unless status
+          invalidate! unless other_result.status
 
           other_result
         end
