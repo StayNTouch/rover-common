@@ -79,29 +79,14 @@ module SNT
 
         private
 
-        # Wrap call execution with optional slave group and transaction blocks
-        def call_with_options(options)
+        # Wrap call execution with optional slave group
+        def call_with_options(_options)
           if self.class.slave_group.present?
             Octopus.using(slave_group: self.class.slave_group) do
-              call_with_optional_transaction(options)
-            end
-          else
-            call_with_optional_transaction(options)
-          end
-        end
-
-        # Wrap call execution with optional transaction block
-        def call_with_optional_transaction(options)
-          if options[:no_transaction]
-            # Don't start a transaction if no_transaction is true
-            call_delegate
-          else
-            # Start a transaction around the service call. Use requires_new to ensure sub transactions can be rolled back without impacting parent
-            # transaction. Services can optionally be invalidated and its transaction rolled back, when a sub-service fails and its sub-transaction is
-            # rolled back.
-            ActiveRecord::Base.transaction(requires_new: true) do
               call_delegate
             end
+          else
+            call_delegate
           end
         end
 
