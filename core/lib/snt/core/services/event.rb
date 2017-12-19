@@ -82,6 +82,19 @@ module SNT
           @published = false
         end
 
+        ##### Arguments for event context
+        #
+        # service: App/Service who published Event
+        #        e.g.) pms, ifc, webhook
+        #
+        # category: Area that events belongs to some like Object, Module
+        #         e.g.) reservation, rate_manager, action
+        #
+        # name: name of event
+        #      e.g.) update, create, checkin, checkout
+        #
+        # data: free form for detail information
+        #
         def event_context
           {
             service: service,
