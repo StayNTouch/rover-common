@@ -88,7 +88,7 @@ module SNT
             category: category,
             name: name,
             data: data,
-            timestamp: DateTime.now.utc,
+            timestamp: Time.now.utc,
             uuid: SecureRandom.uuid
           }
         end
