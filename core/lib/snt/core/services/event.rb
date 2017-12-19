@@ -2,32 +2,103 @@ module SNT
   module Core
     module Services
       class Event
-        attr_accessor :hotel, :object, :action_type, :details, :published
+        ##### Event trigger with initial event information to +service+.dto queue
+        #
+        # e.g.: ::SNT::Core::MQ.publisher.publish(+event_context+, routing_key: 'pms.dto')
+        #
+        ### Case #1: Normal Event with Object and attributes
+        #
+        #   event_args = {
+        #     service: :pms,
+        #     category: :reservation
+        #     name: :update,
+        #     data: {
+        #       object: Reservation,
+        #       attributes: { +attribute_info+ }
+        #     }
+        #
+        #   ::SNT::Core::Services::Event.publish(event_args)
+        #   # => nil
+        #
+        ### Case #2: Normal Event without Object
+        #
+        #   event_args = {
+        #     service: :pms,
+        #     category: :rate_manager,
+        #     name: :update,
+        #     data: {
+        #       details: { +detail_info+ }
+        #     }
+        #
+        #   ::SNT::Core::Services::Event.publish(event_args)
+        #   # => nil
+        #
+        ### Case #3: Event with active_model
+        #
+        # ## PubSub::Notifier.pub_sub_notifier
+        #
+        #   event_args = {
+        #     service: :pms,
+        #     category: :active_model,
+        #     name: :update,
+        #     data: {
+        #       object: Reservation,
+        #       details: { +changes+ },
+        #       attributes: { +attributes+ }
+        #     }
+        #
+        #   ::SNT::Core::Services::Event.publish(event_args)
+        #   # => nil
+        #
+        ### Case #4: Action events. This will just publish to pms.actions exchange directly
+        #
+        #   event_args = {
+        #     service: :pms,
+        #     category: :action,
+        #     name: :action,
+        #     data: {
+        #       object: Action,
+        #       details: {
+        #         action_type: Symbol,
+        #         details: Hash,
+        #         hotel_id: Integer,
+        #         hotel_code: String,
+        #         object_id: Integer,
+        #         object_type: String
+        #       }
+        #     }
+        #
+        #   ::SNT::Core::Services::Event.publish(event_args)
+        #   # => nil
+        #
+        attr_accessor :category, :data, :name, :service, :published
 
-        def initialize(args)
-          @published = false
-          args.each { |key, value| instance_variable_set("@#{key}", value) }
+        def self.publish(args)
+          new(args).publish
         end
 
-        def event_data
+        def initialize(args = {})
+          args.each { |key, value| instance_variable_set("@#{key}", value) }
+          @published = false
+        end
+
+        def event_context
           {
-            action_type: action_type,
-            details: details,
-            hotel_id: hotel.id,
-            hotel_code: hotel.code,
-            object_id: object.id,
-            object_type: object.class.name
+            service: service,
+            category: category,
+            name: name,
+            data: data,
+            timestamp: DateTime.now.utc,
+            uuid: SecureRandom.uuid
           }
         end
 
-        # Publish the event to RabbitMQ exchange for 'pms.actions' and routing_key same as the action_type. Fail if event already published.
+        # Use EventPublisherWorker to format event message and publish to RabbitMQ
         def publish
           raise 'Event already published' if published
 
           begin
-            ::SNT::Core::MQ.publisher.publish(event_data.to_json, exchange: 'pms.actions', exchange_options: { type: :direct, durable: true },
-                                                                  routing_key: action_type.to_s.downcase)
-
+            ::SNT::Core::MQ.publisher.publish(event_context.to_json, routing_key: "#{service}.dto")
             self.published = true
           rescue => e
             logger.error "Could not publish service event to RabbitMQ: #{e.message}"
