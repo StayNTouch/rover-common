@@ -13,7 +13,7 @@ module SNT
         #     category: :reservation
         #     name: :update,
         #     data: {
-        #       object: Reservation,
+        #       object: { type: 'Reservation', id: 123123 },
         #       attributes: { +attribute_info+ }
         #     }
         #
@@ -42,7 +42,7 @@ module SNT
         #     category: :active_model,
         #     name: :update,
         #     data: {
-        #       object: Reservation,
+        #       object: { type: 'Reservation', id: 123123 },
         #       details: { +changes+ },
         #       attributes: { +attributes+ }
         #     }
@@ -57,7 +57,7 @@ module SNT
         #     category: :action,
         #     name: :action,
         #     data: {
-        #       object: Action,
+        #       object: { type: 'Action', id: 123123 },
         #       details: {
         #         action_type: Symbol,
         #         details: Hash,
