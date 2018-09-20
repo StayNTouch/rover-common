@@ -1,5 +1,5 @@
 require 'bunny'
-
+require 'newrelic_rpm'
 module SNT
   module Core
     module MQ
@@ -75,7 +75,9 @@ module SNT
                   end
                 end
               end
-            rescue Bunny::ConnectionClosedError => e
+            # Catching RuntimeError to handle below exception been thrown from bunny create_channel method
+            # "RuntimeError: this connection is not open. Was Bunny::Session#start invoked? Is automatic recovery enabled?"
+            rescue Bunny::ConnectionClosedError, RuntimeError => e
               error_retry_count += 1
               connection_closed_error_handler(e, error_retry_count)
               retry
@@ -86,6 +88,7 @@ module SNT
           nil
             # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
         rescue => e
+          ::NewRelic::Agent.notice_error(e)
           ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
 
           nil
