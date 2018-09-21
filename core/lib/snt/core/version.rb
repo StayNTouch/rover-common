@@ -1,3 +1,3 @@
 module SNT
-  VERSION = '2.6.1'.freeze
+  VERSION = '2.6.4'.freeze
 end
