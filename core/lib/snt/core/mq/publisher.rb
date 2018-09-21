@@ -77,7 +77,7 @@ module SNT
               end
             # Catching RuntimeError to handle below exception been thrown from bunny create_channel method
             # "RuntimeError: this connection is not open. Was Bunny::Session#start invoked? Is automatic recovery enabled?"
-            rescue Bunny::ConnectionClosedError, RuntimeError => e
+            rescue Bunny::Exception, Timeout::Error, RuntimeError => e
               error_retry_count += 1
               connection_closed_error_handler(e, error_retry_count)
               retry
