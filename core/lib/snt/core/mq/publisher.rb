@@ -51,7 +51,7 @@ module SNT
           # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
         rescue ::StandardError => e
           ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
-          raise ConnectionError("#{e.class}: #{e.message}")
+          raise ::SNT::Core::MQ::ConnectionError, "#{e.class}: #{e.message}"
         end
 
         # Publish message to exchange, all exceptions will be caught and return will be false
@@ -78,7 +78,7 @@ module SNT
         # @param msg [String]
         # @param options [Hash] Possible options include exchange, exchange_options, to_queue, and routing_key
         #
-        def broadcast
+        def broadcast(msg, options = {})
           # Threadsafe publish
           @mutex.synchronize do
             error_retry_count = 0
