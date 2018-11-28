@@ -113,10 +113,17 @@ module SNT
           begin
             ::SNT::Core::MQ.publisher.publish(event_context.to_json, routing_key: "#{service}.dto")
             self.published = true
-          rescue => e
+          rescue ::StandardError => e
             logger.error "Could not publish service event to RabbitMQ: #{e.message}"
             logger.error e.backtrace
           end
+        end
+
+        def publish!
+          raise 'Event already published' if published
+
+          ::SNT::Core::MQ.publisher.publish(event_context.to_json, routing_key: "#{service}.dto")
+          self.published = true
         end
       end
     end

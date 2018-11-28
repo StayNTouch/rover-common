@@ -1,5 +1,4 @@
 require 'bunny'
-require 'newrelic_rpm'
 module SNT
   module Core
     module MQ
@@ -37,10 +36,49 @@ module SNT
         ERROR_MAX_RETRY_COUNT = 3
 
         def initialize
-          @mutex = Mutex.new
+          @mutex = ::Mutex.new
         end
 
+        # Publish message to exchange, if failure
+        #
+        # @param msg [String]
+        # @param options [Hash] Possible options include exchange, exchange_options, to_queue, and routing_key
+        # @return [Boolean]
+        #
+        def publish!(msg, options = {})
+          broadcast(msg, options)
+
+          # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
+        rescue ::StandardError => e
+          ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
+          raise ::SNT::Core::MQ::ConnectionError, "#{e.class}: #{e.message}"
+        end
+
+        # Publish message to exchange, all exceptions will be caught and return will be false
+        #
+        # @param msg [String]
+        # @param options [Hash] Possible options include exchange, exchange_options, to_queue, and routing_key
+        # @return [Boolean]
+        #
         def publish(msg, options = {})
+          broadcast(msg, options)
+
+          true
+        # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
+        rescue ::StandardError => e
+          ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
+
+          false
+        end
+
+        private
+
+        # Publish message to exchange
+        #
+        # @param msg [String]
+        # @param options [Hash] Possible options include exchange, exchange_options, to_queue, and routing_key
+        #
+        def broadcast(msg, options = {})
           # Threadsafe publish
           @mutex.synchronize do
             error_retry_count = 0
@@ -65,19 +103,17 @@ module SNT
                 exchange.publish(msg, options)
 
                 # Block until message is confirmed. If it fails, retry up to 3 times.
-                if channel.wait_for_confirms
-                  break
-                else
-                  times += 1
+                break if channel.wait_for_confirms
 
-                  channel.nacked_set.each do |n|
-                    ::SNT::Core::MQ.logger.error "publishing message with id #{n} to #{options[:routing_key]} was nacked by broker time(s) #{times}"
-                  end
+                times += 1
+
+                channel.nacked_set.each do |n|
+                  ::SNT::Core::MQ.logger.error "publishing message with id #{n} to #{options[:routing_key]} was nacked by broker time(s) #{times}"
                 end
               end
-            # Catching RuntimeError to handle below exception been thrown from bunny create_channel method
-            # "RuntimeError: this connection is not open. Was Bunny::Session#start invoked? Is automatic recovery enabled?"
-            rescue Bunny::Exception, Timeout::Error, RuntimeError => e
+              # Catching RuntimeError to handle below exception been thrown from bunny create_channel method
+              # "RuntimeError: this connection is not open. Was Bunny::Session#start invoked? Is automatic recovery enabled?"
+            rescue ::Bunny::Exception, ::Timeout::Error, ::RuntimeError => e
               error_retry_count += 1
               connection_closed_error_handler(e, error_retry_count)
               retry
@@ -86,19 +122,11 @@ module SNT
 
           # Void the return
           nil
-            # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
-        rescue => e
-          ::NewRelic::Agent.notice_error(e)
-          ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
-
-          nil
         end
-
-        private
 
         # Check if we have a connection channel created yet and if it is open
         def ensure_channel!
-          Thread.current[:bunny_channel] = nil unless channel && channel.open?
+          ::Thread.current[:bunny_channel] = nil unless channel && channel.open?
         end
 
         # Find or create the channel for the current thread we will be using for publishing
@@ -108,7 +136,7 @@ module SNT
 
           # Put channel in confirmation mode
           # http://www.rabbitmq.com/confirms.html
-          Thread.current[:bunny_channel] ||= ::SNT::Core::MQ.connection.create_channel.tap(&:confirm_select)
+          ::Thread.current[:bunny_channel] ||= ::SNT::Core::MQ.connection.create_channel.tap(&:confirm_select)
         end
 
         def connection_closed_error_handler(e, error_retry_count)
@@ -116,7 +144,7 @@ module SNT
 
           ::SNT::Core::MQ.logger.warn "Rabbitmq connection is closed. Create connection and retry(#{error_retry_count}/#{ERROR_MAX_RETRY_COUNT})"
 
-          Thread.current[:bunny_channel] = nil
+          ::Thread.current[:bunny_channel] = nil
           ::SNT::Core::MQ.reconnect!
         end
       end
