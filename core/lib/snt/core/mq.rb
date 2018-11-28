@@ -1,6 +1,12 @@
 module SNT
   module Core
-    module MQ; end
+    module MQ
+      # Base class for all MQ exceptions
+      class Exception < ::StandardError; end
+
+      # Class for all MQ connection exceptions
+      class ConnectionError < Exception; end
+    end
   end
 end
 
