@@ -51,7 +51,7 @@ module SNT
           # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
         rescue ::StandardError => e
           ::SNT::Core::MQ.logger.error "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
-          raise ::SNT::Core::MQ::ConnectionError, "#{e.class}: #{e.message}"
+          raise ::SNT::Core::MQ::ConnectionError, "#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
         end
 
         # Publish message to exchange, all exceptions will be caught and return will be false
