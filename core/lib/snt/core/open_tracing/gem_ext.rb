@@ -1,3 +1,4 @@
+require 'elastic_apm/opentracing'
 # This module extends OpenTracing implementation by adding methods defined here
 module OpenTracing
   # Starts a new active span by using the provided header that contains the injected trace info
