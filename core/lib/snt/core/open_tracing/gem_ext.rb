@@ -51,7 +51,8 @@ module OpenTracing
   # the global tracer is not set when we call into the extended methods in this module even when
   # we set it in application.rb or initializers in IFC or PMS
   def self.set_global_tracer_to_elastic
-    ::OpenTracing.global_tracer =
-        ElasticAPM::OpenTracing::Tracer.new unless ::OpenTracing.global_tracer.instance_of?(::ElasticAPM::OpenTracing::Tracer)
+    return if ::OpenTracing.global_tracer.instance_of?(::ElasticAPM::OpenTracing::Tracer)
+
+    ::OpenTracing.global_tracer = ElasticAPM::OpenTracing::Tracer.new
   end
 end
