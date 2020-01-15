@@ -47,7 +47,7 @@ module SNT
         #
         def publish!(msg, options = {})
           if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
-            msg = JSON.parse(msg).merge(headers: OpenTracing.current_trace_object).to_json
+            msg = JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
           end
           broadcast(msg, options)
 
@@ -65,7 +65,7 @@ module SNT
         #
         def publish(msg, options = {})
           if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
-            msg = JSON.parse(msg).merge(headers: OpenTracing.current_trace_object).to_json
+            msg = JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
           end
           broadcast(msg, options)
 
