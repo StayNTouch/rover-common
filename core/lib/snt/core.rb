@@ -5,6 +5,7 @@ module SNT
     autoload :Ref, 'snt/core/ref'
     autoload :RPC, 'snt/core/rpc'
     autoload :Services, 'snt/core/services'
+    autoload :OpenTracing, 'snt/core/open_tracing'
   end
 end
 
