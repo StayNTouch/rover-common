@@ -4,16 +4,10 @@ module SNT
       class ScopeStack
         KEY = :__snt_scope_stack
 
+        delegate :last, :pop, to: :scopes
+
         def push(scope)
           scopes << scope
-        end
-
-        def pop
-          scopes.pop
-        end
-
-        def last
-          scopes.last
         end
 
         private
