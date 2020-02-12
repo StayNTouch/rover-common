@@ -68,7 +68,7 @@ module SNT
           end
 
           def api
-            SNT::Webhook::RPC
+            SNT::Webhook::HTTP
           end
         end
       end
