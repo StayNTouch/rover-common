@@ -2,6 +2,7 @@ require 'snt/core'
 
 module SNT
   module Webhook
+    require 'snt/webhook/configuration'
     require 'snt/webhook/core_ext'
     require 'snt/webhook/errors'
 

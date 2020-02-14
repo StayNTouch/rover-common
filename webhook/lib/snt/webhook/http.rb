@@ -38,18 +38,15 @@ module SNT
 
       private
 
-      def endpoint
-        'http://localhost:5000'
-      end
-
       def connect
-        uri = URI.parse(endpoint)
+        raise SNT::Webhook::Errors::Error, 'Missing API endpoint' if SNT::Webhook.config.api_endpoint.to_s.empty?
+        uri = URI.parse(SNT::Webhook.config.api_endpoint)
 
         Net::HTTP.start(
           uri.host,
           uri.port,
-          open_timeout: 3,
-          read_timeout: 3,
+          open_timeout: SNT::Webhook.config.open_timeout,
+          read_timeout: SNT::Webhook.config.read_timeout,
           use_ssl: uri.scheme == 'https'
         ) do |http|
           response = yield http
