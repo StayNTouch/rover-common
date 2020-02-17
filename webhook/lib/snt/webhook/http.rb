@@ -39,7 +39,7 @@ module SNT
       private
 
       def connect
-        raise SNT::Webhook::Errors::Error, 'Missing API endpoint' if SNT::Webhook.config.api_endpoint.to_s.empty?
+        raise SNT::Webhook::Error, 'Missing API endpoint' if SNT::Webhook.config.api_endpoint.to_s.empty?
         uri = URI.parse(SNT::Webhook.config.api_endpoint)
 
         Net::HTTP.start(
