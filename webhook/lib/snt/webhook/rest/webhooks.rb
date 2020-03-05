@@ -6,10 +6,10 @@ module SNT
       class Webhooks < SNT::Webhook::REST::Base
         resource :webhook
 
-        def list 
+        def list
           get(path)
         end
-        
+
         def create(params)
           post(path, params)
         end

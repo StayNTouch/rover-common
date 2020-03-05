@@ -8,6 +8,7 @@ to `config/initializers/snt_webhook.rb`:
 
 ```ruby
 require 'snt/webhook'
+
 SNT::Webhook.configure do |config|
   config.api_endpoint = ENV['IPC_WEBHOOK_ENDPOINT']
 end
@@ -26,11 +27,43 @@ and DELETE. To override the timeout values set:
 
 ```ruby
 require 'snt/webhook'
+
 SNT::Webhook.configure do |config|
   config.api_endpoint = ENV['IPC_WEBHOOK_ENDPOINT']
   config.open_timeout = 3
   config.read_timeout = 3
 end
+```
+
+## SNT Webhook API client usage
+
+Create an instance of the API client
+
+```ruby
+# Provide the required hotel chain uuid
+client = SNT::Webhook::Client.new(chain_uuid: hotel_chain.uuid)
+```
+
+Passing configuration options to the API client
+
+```ruby
+client = SNT::Webhook::Client.new(
+  chain_uuid: hotel_chain.uuid,
+  api_endpoint: 'http://localhost:3000',
+  read_timeout: 10
+)
+```
+
+Make calls to the available methods. Responses are returned as hashes.
+
+```ruby
+client.webhooks.list
+client.webhooks.create(params)
+client.webhooks.retrieve(uuid)
+client.webhooks.update(uuid, params)
+client.webhooks.destroy(uuid)
+client.webhooks.supporting_events
+client.webhooks.delivery_types
 ```
 
 ## Local Development

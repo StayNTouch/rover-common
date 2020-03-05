@@ -7,10 +7,12 @@ module SNT
       attr_reader :chain_uuid
 
       def initialize(options = {})
-        raise SNT::Webhook::Error, 'Missing API endpoint' if SNT::Webhook.config.api_endpoint.to_s.empty?
-        @chain_uuid   = options.fetch(:chain_uuid, nil)
+        @chain_uuid   = options.fetch(:chain_uuid)
+        @api_endpoint = options.fetch(:api_endpoint, SNT::Webhook.config.api_endpoint)
         @open_timeout = options.fetch(:open_timeout, SNT::Webhook.config.open_timeout)
         @read_timeout = options.fetch(:read_timeout, SNT::Webhook.config.read_timeout)
+
+        raise SNT::Webhook::Error, 'Missing API endpoint' if @api_endpoint.to_s.empty?
       end
 
       def request(method, url, params: nil, body: nil, headers: nil)
@@ -24,10 +26,11 @@ module SNT
       private
 
       def connection
-        @connection ||= Faraday.new(SNT::Webhook.config.api_endpoint, {
-          request: {open_timeout: @open_timeout, timeout: @read_timeout}
-        }) do |conn|
-          conn.headers['Chain-UUID'] = @chain_uuid unless @chain_uuid.nil?
+        @connection ||= Faraday.new(
+          @api_endpoint,
+          headers: { 'Chain-UUID' => @chain_uuid },
+          request: { open_timeout: @open_timeout, timeout: @read_timeout }
+        ) do |conn|
           conn.request  :json
           conn.response :json, content_type: 'application/json'
           conn.use FaradayMiddleware::FollowRedirects, limit: 1
@@ -37,4 +40,3 @@ module SNT
     end
   end
 end
-

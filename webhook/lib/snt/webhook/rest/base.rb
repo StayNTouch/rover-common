@@ -2,9 +2,11 @@ module SNT
   module Webhook
     module REST
       class Base
+        # rubocop:disable Style/TrivialAccessors
         def self.resource(resource)
           @resource = resource
         end
+        # rubocop:enable  Style/TrivialAccessors
 
         def self.resource_name
           @resource.to_s
@@ -17,7 +19,7 @@ module SNT
         def get(url, params = {})
           # Must provide the chain uuid as a query parameter until the Webhook
           # service has been updated to retrieve it from the request headers.
-          @connection.request(:get, url, params: params.merge({chain_uuid: @connection.chain_uuid}))
+          @connection.request(:get, url, params: params.merge(chain_uuid: @connection.chain_uuid))
         end
 
         def post(url, data)
@@ -28,8 +30,8 @@ module SNT
           @connection.request(:put, url, body: data)
         end
 
-        def delete(url, params = {})
-          @connection.request(:delete, url, params: params)
+        def delete(url)
+          @connection.request(:delete, url)
         end
 
         def path(component = nil)

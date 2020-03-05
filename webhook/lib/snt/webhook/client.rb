@@ -4,14 +4,9 @@ require 'snt/webhook/rest/webhooks'
 module SNT
   module Webhook
     class Client
-      def initialize(options = {})
-        @options = options
+      def initialize(chain_uuid:, **options)
+        @options = options.merge(chain_uuid: chain_uuid)
       end
-
-      # Should chain_uuid be required?
-      # def initialize(options = {}, chain_uuid: nil)
-      #   @options = options.merge(chain_uuid: chain_uuid)
-      # end
 
       def webhooks
         @webhooks ||= SNT::Webhook::REST::Webhooks.new(SNT::Webhook::Connection.new(@options))
