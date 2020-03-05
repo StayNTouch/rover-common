@@ -1,11 +1,10 @@
 require 'snt/core'
+require 'snt/webhook/configuration'
+require 'snt/webhook/errors'
 
 module SNT
   module Webhook
-    require 'snt/webhook/core_ext'
-    require 'snt/webhook/errors'
-
-    autoload :API, 'snt/webhook/api'
-    autoload :RPC, 'snt/webhook/rpc'
+    autoload :Client, 'snt/webhook/client'
+    autoload :API,    'snt/webhook/api'
   end
 end

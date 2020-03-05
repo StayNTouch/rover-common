@@ -1,31 +1,51 @@
 module SNT
   module Webhook
     module API
-      class Webhooks < Base
-        class << self
-          # Define basic api methods
-          #
-          # ::SNT::Webhook::API::Webhooks.index(chain_uuid)
-          # ::SNT::Webhook::API::Webhooks.show(uuid)
-          # ::SNT::Webhook::API::Webhooks.create(params)
-          # ::SNT::Webhook::API::Webhooks.update(uuid, params)
-          # ::SNT::Webhook::API::Webhooks.destroy(uuid)
-          #
-          %w(index show create update destroy).each do |method_name|
-            define_method(method_name.to_sym) do |*args|
-              api.call(method_name, args, namespace: :webhook, timeout: 60)
-            end
-          end
+      module Webhooks
+        module_function
 
-          # ::SNT::Webhook::API::Webhooks.supporting_events
-          def supporting_events
-            api.call('supporting_events', {}, namespace: :webhook, timeout: 60)
-          end
+        # Define basic api methods
+        #
+        # ::SNT::Webhook::API::Webhooks.index(chain_uuid)
+        # ::SNT::Webhook::API::Webhooks.show(uuid)
+        # ::SNT::Webhook::API::Webhooks.create(params)
+        # ::SNT::Webhook::API::Webhooks.update(uuid, params)
+        # ::SNT::Webhook::API::Webhooks.destroy(uuid)
+        def index(chain_uuid)
+          client = SNT::Webhook::Client.new(chain_uuid: chain_uuid)
+          client.webhooks.list
+        end
 
-          # ::SNT::Webhook::API::Webhooks.delivery_types
-          def delivery_types
-            api.call('delivery_types', {}, namespace: :webhook, timeout: 60)
-          end
+        def show(uuid)
+          client = SNT::Webhook::Client.new
+          client.webhooks.retrieve(uuid)
+        end
+
+        def create(params)
+          client = SNT::Webhook::Client.new
+          client.webhooks.create(params)
+        end
+
+        def update(uuid, params)
+          client = SNT::Webhook::Client.new
+          client.webhooks.update(uuid, params)
+        end
+
+        def destroy(uuid)
+          client = SNT::Webhook::Client.new
+          client.webhooks.destroy(uuid)
+        end
+
+        # ::SNT::Webhook::API::Webhooks.supporting_events
+        def supporting_events
+          client = SNT::Webhook::Client.new(read_timeout: 60)
+          client.webhooks.supporting_events
+        end
+
+        # ::SNT::Webhook::API::Webhooks.delivery_types
+        def delivery_types
+          client = SNT::Webhook::Client.new(read_timeout: 60)
+          client.webhooks.delivery_types
         end
       end
     end

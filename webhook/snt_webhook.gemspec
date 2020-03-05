@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
 
   s.add_dependency 'snt_core', s.version
-  s.add_dependency('sneakers_packer', '~> 0')
-  s.add_development_dependency('rake', '>= 0')
+  s.add_dependency 'faraday', '~> 0.9'
+  s.add_dependency 'faraday_middleware', '~> 0.14.0'
+
+  s.add_development_dependency 'rake', '>= 0'
 end
