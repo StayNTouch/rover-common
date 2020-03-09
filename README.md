@@ -61,7 +61,7 @@ client.webhooks.list
 client.webhooks.create(params)
 client.webhooks.retrieve(uuid)
 client.webhooks.update(uuid, params)
-client.webhooks.destroy(uuid)
+client.webhooks.delete(uuid)
 client.webhooks.supporting_events
 client.webhooks.delivery_types
 ```
