@@ -6,8 +6,8 @@ module SNT
       class Webhooks < SNT::Webhook::REST::Base
         resource :webhook
 
-        def list
-          get(path)
+        def list(params = {})
+          get(path, params)
         end
 
         def create(params)
@@ -22,8 +22,8 @@ module SNT
           put(path(uuid), params)
         end
 
-        def destroy(uuid)
-          delete(path(uuid))
+        def delete(uuid)
+          super(path(uuid))
         end
 
         def supporting_events
