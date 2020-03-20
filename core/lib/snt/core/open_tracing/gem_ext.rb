@@ -23,13 +23,16 @@ module OpenTracing
     original_mdc_trace = ::Logging.mdc['trace']
     original_mdc_parent_span = ::Logging.mdc['parent_span']
     original_mdc_span = ::Logging.mdc['span']
+    original_mdc_span_name = ::Logging.mdc['span_name']
     ::Logging.mdc['trace'] = span.context.trace_context.trace_id
     ::Logging.mdc['parent_span'] = span.context.trace_context.parent_id
     ::Logging.mdc['span'] = span.context.trace_context.id
+    ::Logging.mdc['span_name'] = span_name
     yield scope
     ::Logging.mdc['trace'] = original_mdc_trace
     ::Logging.mdc['parent_span'] = original_mdc_parent_span
     ::Logging.mdc['span'] = original_mdc_span
+    ::Logging.mdc['span_name'] = original_mdc_span_name
     scope.close
   end
 
