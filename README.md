@@ -10,14 +10,13 @@ to `config/initializers/snt_webhook.rb`:
 require 'snt/webhook'
 
 SNT::Webhook.configure do |config|
-  config.api_endpoint = ENV['IPC_WEBHOOK_ENDPOINT']
+  # Set API endpoint to the host and port of the IPC::WebhookController
+  config.api_endpoint = http://localhost:3000
 end
 ```
 
-### Using environment variables
-
-SNT Webhook will look for the value of its API endpoint in the `IPC_WEBHOOK_ENDPOINT`
-environment variable. There is no default value so the environment variable must be set.
+The IPC Webhook endpoint should be specified in the `config/ipc_connect.yml`
+file of the host Rails application.
 
 ### Timeout
 
@@ -29,7 +28,7 @@ and DELETE. To override the timeout values set:
 require 'snt/webhook'
 
 SNT::Webhook.configure do |config|
-  config.api_endpoint = ENV['IPC_WEBHOOK_ENDPOINT']
+  config.api_endpoint = http://localhost:3000
   config.open_timeout = 3
   config.read_timeout = 3
 end
