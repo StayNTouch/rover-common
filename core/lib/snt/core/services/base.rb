@@ -93,13 +93,13 @@ module SNT
         # Log the start of the service call
         def log_start
           @start_time = Time.now.utc
-          logger.info "Service Starting"
+          logger.debug "Service Starting"
         end
 
         # Log the completion of the service call
         def log_completion
           duration = Time.now.utc - @start_time
-          logger.info "Service Completed, duration: #{duration} seconds, status: #{result.status}, errors: '#{result.formatted_errors}', " \
+          logger.debug "Service Completed, duration: #{duration} seconds, status: #{result.status}, errors: '#{result.formatted_errors}', " \
                       "open transactions: #{ActiveRecord::Base.connection.open_transactions}"
         end
 
