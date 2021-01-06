@@ -7,7 +7,6 @@ module SNT
 
         def self.inherited(base)
           base.extend(Callbacks)
-          base.extend(SlaveGroup)
         end
 
         # Provide class level call method as convenience over calling new, then call
@@ -79,15 +78,9 @@ module SNT
 
         private
 
-        # Wrap call execution with optional slave group
-        def call_with_options(_options)
-          if self.class.slave_group.present?
-            Octopus.using(slave_group: self.class.slave_group) do
-              call_delegate
-            end
-          else
-            call_delegate
-          end
+        # A method to isolate the call to call_delegate, this allows for more controlled overriding
+        def call_with_options(_)
+          call_delegate
         end
 
         # Log the start of the service call
