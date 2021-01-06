@@ -9,7 +9,6 @@ module SNT
       autoload :Event, 'snt/core/services/event'
       autoload :InvalidException, 'snt/core/services/invalid_exception'
       autoload :Result, 'snt/core/services/result'
-      autoload :SlaveGroup, 'snt/core/services/slave_group'
     end
   end
 end
