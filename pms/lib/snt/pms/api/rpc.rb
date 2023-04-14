@@ -17,7 +17,7 @@ module SNT
           def call(method, message, options = {})
             queue = options.delete(:queue) || 'api'
 
-            SneakersPacker.remote_call(
+            SneakersPacker.assert_connection_and_remote_call(
               "pms.#{queue}.rpc",
               {
                 request_id: SecureRandom.uuid,
