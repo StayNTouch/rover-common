@@ -46,9 +46,6 @@ module SNT
         # @return [Boolean]
         #
         def publish!(msg, options = {})
-          if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
-            msg = JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
-          end
           broadcast(msg, options)
 
           # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
@@ -64,9 +61,6 @@ module SNT
         # @return [Boolean]
         #
         def publish(msg, options = {})
-          if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
-            msg = JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
-          end
           broadcast(msg, options)
 
           true
