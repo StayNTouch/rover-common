@@ -10,8 +10,8 @@ module SNT
         end
 
         # Provide class level call method as convenience over calling new, then call
-        def self.call(*args, &block)
-          new(*args, &block).call
+        def self.call(...)
+          new(...).call
         end
 
         # @params
