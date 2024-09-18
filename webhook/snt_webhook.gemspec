@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
   s.files = `git ls-files`.split("\n")
   s.require_path = 'lib'
 
-  s.add_dependency 'faraday', '~> 0.9'
-  s.add_dependency 'faraday_middleware', '~> 0.14.0'
+  s.add_dependency 'faraday', '~> 1.0'
+  s.add_dependency 'faraday_middleware', '~> 1.2.0'
   s.add_dependency 'snt_core', s.version
 
   s.add_development_dependency 'rake', '>= 0'
