@@ -98,7 +98,7 @@ module SNT
 
         # Initialize the logger with the class name
         def logger
-          @logger ||= Logging::Logger[self.class.name]
+          @logger ||= Rails.logger
         end
       end
     end
