@@ -85,6 +85,13 @@ module SNT
         # @param options [Hash] Possible options include exchange, exchange_options, to_queue, and routing_key
         #
         def broadcast(msg, options = {})
+          # If options[:routing_key] is provided, and it is a symbol, log a warning
+          # and convert it to a string
+          if options[:routing_key].is_a?(Symbol)
+            ::SNT::Core::MQ.logger.warn "Routing key is a symbol, converting to string: #{options[:routing_key]}"
+            options[:routing_key] = options[:routing_key].to_s
+          end
+
           # Threadsafe publish
           @mutex.synchronize do
             error_retry_count = 0
