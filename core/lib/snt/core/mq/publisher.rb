@@ -46,9 +46,7 @@ module SNT
         # @return [Boolean]
         #
         def publish!(msg, options = {})
-          if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
-            msg = JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
-          end
+          msg = add_tracing_headers(msg)
           broadcast(msg, options)
 
           # We must rescue all exceptions, so an issue with queuing system does not degrade the rest of the app
@@ -64,9 +62,7 @@ module SNT
         # @return [Boolean]
         #
         def publish(msg, options = {})
-          if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
-            msg = JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
-          end
+          msg = add_tracing_headers(msg)
           broadcast(msg, options)
 
           true
@@ -78,6 +74,18 @@ module SNT
         end
 
         private
+
+        def add_tracing_headers(msg)
+          if defined?(::OpenTracing) && ::OpenTracing.current_trace_object
+            JSON.parse(msg).merge(headers: ::OpenTracing.current_trace_object).to_json
+          elsif defined?(::OpenTelemetry)
+            headers = {}
+            ::OpenTelemetry.propagation.inject(headers)
+            JSON.parse(msg).merge(headers: headers).to_json
+          else
+            msg
+          end
+        end
 
         # Publish message to exchange
         #
