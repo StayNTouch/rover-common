@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.description = 'Stayntouch'
   s.homepage     = ''
 
-  s.required_ruby_version = '>= 2.1.7'
+  s.required_ruby_version = '>= 3.0.1'
 
   s.files        = Dir.glob('{bin,lib}/**/*') + %w(README.md)
   s.bindir        = 'bin'
