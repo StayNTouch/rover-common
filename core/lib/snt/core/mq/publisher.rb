@@ -85,12 +85,19 @@ module SNT
         # @param options [Hash] Possible options include exchange, exchange_options, to_queue, and routing_key
         #
         def broadcast(msg, options = {})
+          # Work on a copy: the caller's hash is never changed
+          options = options.dup
+
           # If options[:routing_key] is provided, and it is a symbol, log a warning
           # and convert it to a string
           if options[:routing_key].is_a?(Symbol)
             ::SNT::Core::MQ.logger.warn "Routing key is a symbol, converting to string: #{options[:routing_key]}"
             options[:routing_key] = options[:routing_key].to_s
           end
+
+          # Establish route. Resolved once, outside the retried block, so every attempt uses the same routing key
+          to_queue = options.delete(:to_queue)
+          options[:routing_key] ||= to_queue
 
           # Threadsafe publish
           @mutex.synchronize do
@@ -102,18 +109,16 @@ module SNT
               # Check for targeted exchange, otherwise use the default
               exchange = options[:exchange] ? channel.exchange(options[:exchange], options[:exchange_options]) : channel.default_exchange
 
-              # Establish route
-              to_queue = options.delete(:to_queue)
-              options[:routing_key] ||= to_queue
-
               # Log the message being published with some context
               ::SNT::Core::MQ.logger.info "SNT::Publisher#publish on tid #{Thread.current.object_id} <#{msg}>" \
                                           " to [#{exchange.name}, #{options[:routing_key]}]"
 
               times = 0
               while times <= 3 do
-                # Publish to RabbitMQ
-                exchange.publish(msg, options)
+                # Publish to RabbitMQ. Bunny's Exchange#publish removes :routing_key from the hash it is given,
+                # so each attempt gets its own copy. Otherwise a nack retry, or a retry after a closed connection,
+                # would publish with an empty routing key and the message would be dropped as unroutable.
+                exchange.publish(msg, options.dup)
 
                 # Block until message is confirmed. If it fails, retry up to 3 times.
                 break if channel.wait_for_confirms
